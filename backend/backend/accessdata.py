@@ -6,7 +6,9 @@ from stock.models import Stock
 def access_stock_code(request):
     print(request.POST.get('stockcode'))
     stockcode = request.POST.get('stockcode')
-    return HttpResponse((request.POST.get('stockcode')))
+    if(get_code(stockcode)==False):
+        return HttpResponse('Not Found this stock!!!')
+    return HttpResponse(get_code(stockcode),'string')
 
 '''@csrf_exempt
 def write_stock_list(self):
@@ -22,7 +24,9 @@ def write_stock_list(self):
 
 
 def get_code(stockcode):
-    if(len(stockcode)==6):
-        if(stockcode.startswith('6')):
-            return "1."+stockcode
-        
+    QuerySet = Stock.objects.filter(content = stockcode)
+    if(len(QuerySet)==0):
+        return False
+    else:
+        return "1."+stockcode
+
