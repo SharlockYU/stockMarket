@@ -71,7 +71,7 @@
         <tbody>
        <!--    <tr>-->
          <tr v-for='stock in stocks' :key='stock.id' > 
-            <td>{{stock.stockcode}}</td>
+            <td>{{stock.股票代码}}</td>
             <td>{{stock.股票名称}}</td>
             <td>{{stock.最新价}}</td>
             <td>{{stock.最高价}}</td>
@@ -120,7 +120,15 @@ export default {
     getnewstock(){
       if(this.stockcode=='')
       {
-        console.log('请输入代码')
+        axios({
+          headers:{'Content-Type':'application/x-www-form-urlencoded'},
+          method:'get',
+          url :'http://localhost:8000/get_allcode/'
+
+        }).then(res=>{
+          this.stocks = res.data
+          console.log(res.data)
+        })
 
       }
       else
@@ -159,17 +167,17 @@ export default {
         data :JSON.stringify(data1)
       }).then(res=>{
         console.log(res.data)
-      //  this.stocks = {stock:res.data}
-          this.stocks={
-          stock1 : {stockcode : res.data['股票代码'],
-                   stockname : res.data['股票名称'],
-                   stocknow  : res.data['最新价'],
-                   stockhigh : res.data['最高价']},
-          stock2 : {stockcode : '1231',
-                   stockname : 'dwdwdd',
-                   stocknow  : 12,
-                   stockhigh : 15}
-        }
+        this.stocks = {stock:res.data}
+        //   this.stocks={
+        //   stock1 : {stockcode : res.data['股票代码'],
+        //            stockname : res.data['股票名称'],
+        //            stocknow  : res.data['最新价'],
+        //            stockhigh : res.data['最高价']},
+        //   stock2 : {stockcode : '1231',
+        //            stockname : 'dwdwdd',
+        //            stocknow  : 12,
+        //            stockhigh : 15}
+        // }
 
        // $('#stockcode').text(res.data['股票代码'])
       //  this.stocks.title = res.data['股票名称']
@@ -209,6 +217,7 @@ export default {
   // },
   created(){
    // this.getAll();
+   this.getnewstock();
   }
   }
 }

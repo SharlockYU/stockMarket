@@ -1,3 +1,6 @@
+
+import grequests
+import requests
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import  csrf_exempt 
@@ -5,6 +8,16 @@ import csv
 import pandas as pd
 import json
 from stock.models import Stock
+
+
+
+
+
+
+
+get_url= 'http://push2.eastmoney.com/api/qt/stock/get?fields=f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f57,f58,f71,f116,f117,f60,f162,f163,f164,f167,f168,f170,f173&secid=' 
+
+
 @csrf_exempt
 def access_stock_code(request):
     print(request.POST.get('stockcode'))
@@ -40,6 +53,8 @@ def accessdata(request):
 
 def accessformat(LIST):
     stocknowdata = LIST['data2']['data']
+    if(stocknowdata ==None):
+        return 'None'
     listnow = list(stocknowdata.values())
     listnew = [listnow[10],listnow[11],listnow[0],listnow[1],
                 listnow[21],listnow[2],listnow[3],listnow[12],
@@ -68,5 +83,33 @@ def get_code(stockcode):
 @csrf_exempt
 def get_allcode(request):
     QuerySet = Stock.objects.all()
-    print(QuerySet[4].content)
-    return HttpResponse("ok")
+    list =[]
+    dictlist = []
+    stockdict = {}
+    for stock in QuerySet:
+        list.append(get_url+"1."+stock.content)
+    #print(list)
+    tasks = [grequests.get(u) for u in list]
+    datalist = grequests.map(tasks,size= 2000)
+    for data in datalist:
+        dict ={'data2':json.loads(data.text)}
+        dictlist.append(accessformat(dict))
+    for i in range(len(dictlist)):
+        stockdict[i] = dictlist[i]
+
+    #print(stockdict)
+    return HttpResponse(json.dumps(stockdict))
+
+def url_request(url,stockcode):
+    httpsession = requests.session()
+    try:
+        r = httpsession.get(url+stockcode)
+        r.raise_for_status()
+        r.encoding = "UTF-8"
+        return r.text
+    except:
+        return '产生异常'
+
+
+
+
