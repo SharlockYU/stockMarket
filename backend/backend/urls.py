@@ -23,6 +23,8 @@ router = routers.DefaultRouter()
 router.register('stock',StockViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
-    url('accessdata/',accessdata.access_stock_code),
+    url('access_stock_code/',accessdata.access_stock_code),
+    url('accessdata/',accessdata.accessdata),
+    url('get_allcode/',accessdata.get_allcode),
    # url('write/',accessdata.write_stock_list),
 ]
